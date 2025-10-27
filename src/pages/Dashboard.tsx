@@ -1,8 +1,30 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChefHat, Menu, Eye, Settings, BarChart } from "lucide-react";
+import { ChefHat, Menu, Eye, Settings, BarChart, LogOut } from "lucide-react";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  // TODO: Fetch actual data from API
+  // API endpoint: GET /api/dashboard-stats
+  
+  const handleEditMenu = () => {
+    navigate("/edit-menu");
+  };
+
+  const handlePreviewMenu = () => {
+    // TODO: Get subdomain from API
+    // For now using placeholder
+    window.open("https://yourrestaurant.troveindustries.dev/menu", "_blank");
+  };
+
+  const handleLogout = () => {
+    // TODO: Implement logout API call
+    // API endpoint: POST /api/auth/logout
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/20 to-background">
       {/* Header */}
@@ -18,10 +40,12 @@ const Dashboard = () => {
                 <p className="text-sm text-muted-foreground">Manage your restaurant menu</p>
               </div>
             </div>
-            <Button variant="outline">
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -71,7 +95,11 @@ const Dashboard = () => {
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button className="w-full justify-start h-auto py-4" variant="outline">
+            <Button 
+              className="w-full justify-start h-auto py-4" 
+              variant="outline"
+              onClick={handleEditMenu}
+            >
               <Menu className="mr-3 h-5 w-5" />
               <div className="text-left">
                 <div className="font-semibold">Edit Menu</div>
@@ -79,7 +107,11 @@ const Dashboard = () => {
               </div>
             </Button>
 
-            <Button className="w-full justify-start h-auto py-4" variant="outline">
+            <Button 
+              className="w-full justify-start h-auto py-4" 
+              variant="outline"
+              onClick={handlePreviewMenu}
+            >
               <Eye className="mr-3 h-5 w-5" />
               <div className="text-left">
                 <div className="font-semibold">Preview Menu</div>
@@ -87,7 +119,11 @@ const Dashboard = () => {
               </div>
             </Button>
 
-            <Button className="w-full justify-start h-auto py-4" variant="outline">
+            <Button 
+              className="w-full justify-start h-auto py-4" 
+              variant="outline"
+              onClick={() => navigate("/analytics")}
+            >
               <BarChart className="mr-3 h-5 w-5" />
               <div className="text-left">
                 <div className="font-semibold">View Analytics</div>
@@ -95,7 +131,11 @@ const Dashboard = () => {
               </div>
             </Button>
 
-            <Button className="w-full justify-start h-auto py-4" variant="outline">
+            <Button 
+              className="w-full justify-start h-auto py-4" 
+              variant="outline"
+              onClick={() => navigate("/settings")}
+            >
               <Settings className="mr-3 h-5 w-5" />
               <div className="text-left">
                 <div className="font-semibold">Restaurant Settings</div>
