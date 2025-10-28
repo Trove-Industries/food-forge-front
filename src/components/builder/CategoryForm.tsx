@@ -15,7 +15,6 @@ import {
 import { toast } from "sonner";
 
 interface CategoryFormProps {
-  categories: Category[];
   onSave: (data: Category[]) => void;
 }
 
@@ -28,106 +27,123 @@ const iconOptions = [
   { value: "icecream", icon: IceCream, label: "Desserts" },
 ];
 
-const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
-  const [localCategories, setLocalCategories] = useState<Category[]>(categories);
-  const [newCategory, setNewCategory] = useState({
-    name: "",
-    icon: "utensils",
-  });
+const CategoryForm = ({ onSave }: CategoryFormProps) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [newCategory, setNewCategory] = useState({ name: "", icon: "utensils" });
+  const [restaurantName, setRestaurantName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // ✅ Load existing categories on mount
+  // ✅ On mount: check restaurant session & restore categories
   useEffect(() => {
-    const fetchCategories = async () => {
+    async function init() {
       try {
-        const response = await fetch(`${API_BASE_URL}/menu/get-categories`, {
-          method: "GET",
-          credentials: "include",
-        });
+        // Check restaurant session
+        const resSession = await fetch(
+            `${API_BASE_URL}/restaurant/restore-restaurant-session`,
+            { method: "GET", credentials: "include", headers: { "Content-Type": "application/json" } }
+        );
 
-        if (!response.ok) throw new Error("Failed to load categories");
+        if (!resSession.ok) {
+          toast.error("No restaurant session found. Redirecting...");
+          setTimeout(() => (window.location.href = "/"), 2000);
+          return;
+        }
 
-        const data: Category[] = await response.json();
-        setLocalCategories(data);
-        onSave(data);
+        const restaurantData = await resSession.json();
+        setRestaurantName(restaurantData.restaurant_name);
+
+        // Restore categories
+        const resCategories = await fetch(
+            `${API_BASE_URL}/menu/restore-category-session`,
+            { method: "GET", credentials: "include", headers: { "Content-Type": "application/json" } }
+        );
+
+        if (resCategories.ok) {
+          const existingCategories: Category[] = await resCategories.json();
+          // Ensure restored categories have default icon if missing
+          const formattedCategories = existingCategories.map((c) => ({
+            ...c,
+            icon: c.icon || "utensils",
+          }));
+          setCategories(formattedCategories);
+          onSave(formattedCategories);
+        }
       } catch (error) {
-        console.error("Error fetching categories:", error);
-        toast.error("Could not load categories");
+        console.error("Initialization error:", error);
+        toast.error("Failed to load restaurant or categories.");
       }
-    };
+    }
 
-    fetchCategories();
+    init();
   }, [onSave]);
 
-  // ✅ Add category
+  // ✅ Add a new category
   const addCategory = async () => {
     if (!newCategory.name.trim()) {
       toast.error("Please enter a category name");
       return;
     }
 
+    setLoading(true);
+
     try {
-      const response = await fetch(`${API_BASE_URL}/menu/create-category`, {
+      const res = await fetch(`${API_BASE_URL}/menu/create-category`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category_name: newCategory.name,
-          category_icon: newCategory.icon,
-        }),
+        body: JSON.stringify({ category_name: newCategory.name, category_icon: newCategory.icon }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to create category");
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || "Failed to create category");
       }
 
-      const data: Category = await response.json();
-      const updated = [...localCategories, data];
-
-      setLocalCategories(updated);
+      const createdCategory: Category = await res.json();
+      const updated = [...categories, createdCategory];
+      setCategories(updated);
       onSave(updated);
+
       setNewCategory({ name: "", icon: "utensils" });
       toast.success("Category added successfully!");
     } catch (err) {
       console.error("Error creating category:", err);
       toast.error("Failed to create category");
+    } finally {
+      setLoading(false);
     }
   };
 
   // ✅ Delete category
   const removeCategory = async (id: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/menu/delete-category/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/menu/delete-category/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to delete category");
-      }
+      if (!res.ok) throw new Error("Failed to delete category");
 
-      const updated = localCategories.filter((c) => c.id !== id);
-      setLocalCategories(updated);
+      const updated = categories.filter((c) => c.id !== id);
+      setCategories(updated);
       onSave(updated);
       toast.success("Category removed successfully!");
     } catch (err) {
-      console.error("Error deleting category:", err);
+      console.error(err);
       toast.error("Failed to delete category");
     }
   };
 
   return (
       <div className="space-y-6">
-        {/* Header */}
         <div>
           <h2 className="text-2xl font-bold mb-2">Menu Categories</h2>
           <p className="text-muted-foreground">
-            Add categories to organize your menu items
+            Restaurant: {restaurantName || "Loading..."}
           </p>
         </div>
 
-        {/* Add New Category */}
+        {/* Add Category */}
         <Card className="p-4 bg-accent/50">
           <div className="space-y-4">
             <div>
@@ -136,9 +152,7 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
                   id="categoryName"
                   placeholder="e.g., Main Course"
                   value={newCategory.name}
-                  onChange={(e) =>
-                      setNewCategory({ ...newCategory, name: e.target.value })
-                  }
+                  onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
               />
             </div>
 
@@ -151,9 +165,7 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
                       <button
                           key={option.value}
                           type="button"
-                          onClick={() =>
-                              setNewCategory({ ...newCategory, icon: option.value })
-                          }
+                          onClick={() => setNewCategory({ ...newCategory, icon: option.value })}
                           className={`p-3 rounded-lg border-2 transition-all ${
                               newCategory.icon === option.value
                                   ? "border-primary bg-primary/10"
@@ -168,47 +180,48 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
               </div>
             </div>
 
-            <Button onClick={addCategory} className="w-full">
+            <Button onClick={addCategory} className="w-full" disabled={loading}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Category
+              {loading ? "Adding..." : "Add Category"}
             </Button>
           </div>
         </Card>
 
         {/* Categories List */}
-        {localCategories.length > 0 && (
+        {categories.length > 0 ? (
             <div className="space-y-3">
-              <h3 className="font-semibold">
-                Your Categories ({localCategories.length})
-              </h3>
+              <h3 className="font-semibold">Your Categories ({categories.length})</h3>
               <div className="grid gap-3">
-                {localCategories.map((category) => {
+                {categories.map((category) => {
                   const IconComponent =
                       iconOptions.find((i) => i.value === category.icon)?.icon ||
                       UtensilsCrossed;
                   return (
-                      <Card
-                          key={category.id}
-                          className="p-4 flex items-center justify-between"
-                      >
+                      <Card key={category.id} className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-primary/10 rounded-lg">
                             <IconComponent className="w-5 h-5 text-primary" />
                           </div>
                           <span className="font-medium">{category.name}</span>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeCategory(category.id)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => removeCategory(category.id)}>
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </Card>
                   );
                 })}
               </div>
+              <Button
+                  onClick={() => (window.location.href = "/menu_add_meal_group")}
+                  className="w-full mt-4"
+              >
+                Continue
+              </Button>
             </div>
+        ) : (
+            <p className="text-sm text-muted-foreground">
+              No categories added yet. Add your first category above!
+            </p>
         )}
       </div>
   );
