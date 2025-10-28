@@ -19,10 +19,13 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
     });
     const [loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(false); // disable form if session exists
+    const [sessionRestored, setSessionRestored] = useState(false); // prevent double restore in Strict Mode
 
     // Restore session on mount
     useEffect(() => {
         async function restoreSession() {
+            if (sessionRestored) return; // only restore once
+
             try {
                 const response = await fetch(
                     "https://api.troveindustries.dev/restaurant/restore-restaurant-session",
@@ -34,22 +37,22 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                 );
 
                 if (response.ok) {
-                    const data = await response.json();
+                    const data = await response.json().catch(() => ({}));
+
                     if (data.restaurant_name) {
-                        setFormData({
+                        const restoredData = {
                             name: data.restaurant_name,
                             country: data.restaurant_country,
                             city: data.restaurant_city,
                             subdomain: data.restaurant_subdomain,
-                        });
+                        };
+
+                        setFormData(restoredData);
                         setDisabled(true);
+                        setSessionRestored(true);
+
                         toast.success("Session restored! Restaurant details loaded.");
-                        onSave({
-                            name: data.restaurant_name,
-                            country: data.restaurant_country,
-                            city: data.restaurant_city,
-                            subdomain: data.restaurant_subdomain,
-                        });
+                        onSave(restoredData);
                     }
                 }
             } catch (err) {
@@ -58,7 +61,7 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
         }
 
         restoreSession();
-    }, [onSave]);
+    }, [onSave, sessionRestored]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -88,6 +91,7 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
             }
 
             setDisabled(true);
+            setSessionRestored(true);
             toast.success("Restaurant created and session saved!", { id: toastId });
             onSave(formData);
         } catch (err) {
@@ -115,9 +119,7 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                         id="name"
                         placeholder="e.g., The Golden Fork"
                         value={formData.name}
-                        onChange={(e) =>
-                            setFormData({ ...formData, name: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
                         disabled={disabled}
                     />
@@ -144,9 +146,7 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                             id="city"
                             placeholder="e.g., Nairobi"
                             value={formData.city}
-                            onChange={(e) =>
-                                setFormData({ ...formData, city: e.target.value })
-                            }
+                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                             required
                             disabled={disabled}
                         />
@@ -163,9 +163,7 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                             onChange={(e) =>
                                 setFormData({
                                     ...formData,
-                                    subdomain: e.target.value
-                                        .toLowerCase()
-                                        .replace(/[^a-z0-9]/g, ""),
+                                    subdomain: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ""),
                                 })
                             }
                             required
@@ -181,12 +179,11 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                 </div>
             </div>
 
-            {!disabled && (
+            {!disabled ? (
                 <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating..." : "Create & Continue"}
                 </Button>
-            )}
-            {disabled && (
+            ) : (
                 <Button type="button" className="w-full" disabled>
                     Restaurant Already Created
                 </Button>
