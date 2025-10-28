@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RestaurantDetails } from "@/pages/MenuBuilder";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 
 interface RestaurantDetailsFormProps {
   initialData: RestaurantDetails | null;
@@ -115,8 +114,11 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
 
   if (isCheckingSession) {
     return (
-        <div className="space-y-6 flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Restaurant Details</h2>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
         </div>
     );
   }
@@ -193,16 +195,7 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
             className="w-full"
             disabled={isDisabled || isLoading}
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
-            </>
-          ) : isDisabled ? (
-            'Restaurant Already Created'
-          ) : (
-            'Save & Continue'
-          )}
+          {isLoading ? 'Creating...' : isDisabled ? 'Restaurant Already Created' : 'Save & Continue'}
         </Button>
       </form>
   );
