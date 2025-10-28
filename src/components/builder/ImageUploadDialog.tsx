@@ -18,14 +18,27 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
   const [selectedStock, setSelectedStock] = useState<string>("");
   const [aiPrompt, setAiPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [stockSearchQuery, setStockSearchQuery] = useState<string>("");
+  const [isSearching, setIsSearching] = useState(false);
 
   // Stock image examples (in real app, these would come from an API)
-  const stockImages = [
-    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop",
+  const allStockImages = [
+    { url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop", tags: "food, meal, dish" },
+    { url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop", tags: "pizza, italian, food" },
+    { url: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop", tags: "pancakes, breakfast, food" },
+    { url: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop", tags: "salad, healthy, food" },
+    { url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop", tags: "burger, fast food, meal" },
+    { url: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop", tags: "coffee, drink, beverage" },
+    { url: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop", tags: "dessert, cake, sweet" },
+    { url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop", tags: "salad, vegetables, healthy" },
   ];
+
+  // Filter stock images based on search query
+  const filteredStockImages = stockSearchQuery.trim()
+    ? allStockImages.filter(img => 
+        img.tags.toLowerCase().includes(stockSearchQuery.toLowerCase())
+      )
+    : allStockImages;
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,19 +128,49 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
           </TabsContent>
 
           <TabsContent value="stock" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              {stockImages.map((url, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all ${
-                    selectedStock === url ? "border-primary ring-2 ring-primary" : "border-transparent"
-                  }`}
-                  onClick={() => setSelectedStock(url)}
-                >
-                  <img src={url} alt={`Stock ${index + 1}`} className="w-full h-40 object-cover" />
-                </div>
-              ))}
+            <div className="flex gap-2 mb-4">
+              <Input
+                placeholder="Search images (e.g., 'pizza', 'coffee', 'dessert')"
+                value={stockSearchQuery}
+                onChange={(e) => setStockSearchQuery(e.target.value)}
+                className="flex-1"
+              />
+              <Button 
+                variant="outline" 
+                onClick={() => setStockSearchQuery("")}
+                disabled={!stockSearchQuery}
+              >
+                Clear
+              </Button>
             </div>
+
+            {isSearching ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <>
+                {filteredStockImages.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No images found. Try a different search term.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                    {filteredStockImages.map((img, index) => (
+                      <div
+                        key={index}
+                        className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all ${
+                          selectedStock === img.url ? "border-primary ring-2 ring-primary" : "border-transparent"
+                        }`}
+                        onClick={() => setSelectedStock(img.url)}
+                      >
+                        <img src={img.url} alt={img.tags} className="w-full h-40 object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
             
             {selectedStock && (
               <Button onClick={() => handleSelect(selectedStock)} className="w-full">
