@@ -131,7 +131,10 @@ const Dashboard = () => {
 
         {/* Stats */}
         <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
+          <Card 
+            className="p-6 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            onClick={() => navigate("/categories")}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Categories</p>
@@ -143,7 +146,10 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card 
+            className="p-6 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            onClick={() => navigate("/meal-groups")}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Meal Groups</p>
@@ -155,7 +161,10 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card 
+            className="p-6 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            onClick={() => navigate("/meals")}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Meals</p>
