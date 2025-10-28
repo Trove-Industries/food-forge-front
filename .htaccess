@@ -1,8 +1,9 @@
-# Ensure correct MIME types for JS and CSS
+# MIME types
 AddType text/javascript .js
 AddType text/css .css
 AddType application/javascript .mjs
 
+# SPA routing
 RewriteEngine On
 RewriteBase /
 RewriteRule ^index\.html$ - [L]
