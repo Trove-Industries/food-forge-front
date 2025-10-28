@@ -1,7 +1,11 @@
+# Ensure correct MIME types for JS and CSS
+AddType text/javascript .js
+AddType text/css .css
+AddType application/javascript .mjs
+
 RewriteEngine On
 RewriteBase /
 RewriteRule ^index\.html$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.html [L]
-
