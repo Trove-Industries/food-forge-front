@@ -47,7 +47,7 @@ const MenuPreview = () => {
       {/* Menu Preview with iframe */}
       <div className="h-[calc(100vh-73px)]">
         <iframe
-          src={`https://${restaurantDetails.subdomain}.troveindustries.dev/menu`}
+          src={`http://${restaurantDetails.subdomain}.localhost:8000/menu`} /* TODO change to https//${restaurantDetails.subdomain}.troveindustries.dev/menu in deployment*/
           className="w-full h-full border-0"
           title="Menu Preview"
         />

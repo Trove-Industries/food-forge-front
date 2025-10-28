@@ -11,6 +11,8 @@ import EditMenu from "./pages/EditMenu";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Landing from "@/pages/Landing.tsx";
+import MenuPreviewDashboard from "@/pages/MenuPreviewDashboard";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +23,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MenuBuilder />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/builder" element={<MenuBuilder />} />
           <Route path="/preview" element={<MenuPreview />} />
           <Route path="/signup" element={<Signup />} />
@@ -29,7 +31,7 @@ const App = () => (
           <Route path="/edit-menu" element={<EditMenu />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/menu-preview" element={<MenuPreviewDashboard />} />          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
