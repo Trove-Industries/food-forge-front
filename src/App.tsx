@@ -13,9 +13,6 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Landing from "@/pages/Landing.tsx";
 import MenuPreviewDashboard from "@/pages/MenuPreviewDashboard";
-import CategoryList from "@/pages/CategoryList";
-import MealGroupList from "@/pages/MealGroupList";
-import MealList from "@/pages/MealList";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +20,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner position="bottom-center" />
+      <Sonner />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -34,11 +31,7 @@ const App = () => (
           <Route path="/edit-menu" element={<EditMenu />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/menu-preview" element={<MenuPreviewDashboard />} />
-          <Route path="/categories" element={<CategoryList />} />
-          <Route path="/meal-groups" element={<MealGroupList />} />
-          <Route path="/meals" element={<MealList />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/menu-preview" element={<MenuPreviewDashboard />} />          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
