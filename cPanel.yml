@@ -3,4 +3,4 @@ build:
   commands:
     - npm install
     - npm run build
-  dist: build
+  dist: dist
