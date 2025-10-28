@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -29,13 +29,36 @@ const iconOptions = [
 ];
 
 const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
-  const [localCategories, setLocalCategories] =
-      useState<Category[]>(categories);
+  const [localCategories, setLocalCategories] = useState<Category[]>(categories);
   const [newCategory, setNewCategory] = useState({
     name: "",
     icon: "utensils",
   });
 
+  // ✅ Load existing categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/menu/get-categories`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) throw new Error("Failed to load categories");
+
+        const data: Category[] = await response.json();
+        setLocalCategories(data);
+        onSave(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("Could not load categories");
+      }
+    };
+
+    fetchCategories();
+  }, [onSave]);
+
+  // ✅ Add category
   const addCategory = async () => {
     if (!newCategory.name.trim()) {
       toast.error("Please enter a category name");
@@ -55,26 +78,23 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Failed to create category: ${errorText}`);
+        throw new Error(errorText || "Failed to create category");
       }
 
       const data: Category = await response.json();
-
       const updated = [...localCategories, data];
+
       setLocalCategories(updated);
       onSave(updated);
       setNewCategory({ name: "", icon: "utensils" });
       toast.success("Category added successfully!");
     } catch (err) {
       console.error("Error creating category:", err);
-      const errorMessage =
-          err instanceof Error
-              ? err.message
-              : "Something went wrong. Please try again.";
-      toast.error(errorMessage);
+      toast.error("Failed to create category");
     }
   };
 
+  // ✅ Delete category
   const removeCategory = async (id: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/menu/delete-category/${id}`, {
@@ -84,7 +104,7 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Failed to delete category: ${errorText}`);
+        throw new Error(errorText || "Failed to delete category");
       }
 
       const updated = localCategories.filter((c) => c.id !== id);
@@ -93,16 +113,13 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
       toast.success("Category removed successfully!");
     } catch (err) {
       console.error("Error deleting category:", err);
-      const errorMessage =
-          err instanceof Error
-              ? err.message
-              : "Something went wrong. Please try again.";
-      toast.error(errorMessage);
+      toast.error("Failed to delete category");
     }
   };
 
   return (
       <div className="space-y-6">
+        {/* Header */}
         <div>
           <h2 className="text-2xl font-bold mb-2">Menu Categories</h2>
           <p className="text-muted-foreground">
