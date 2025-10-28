@@ -25,39 +25,39 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
     if (initialData) setFormData(initialData);
   }, [initialData]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       setLoading(true);
-      toast.loading("Saving restaurant details...");
+      const toastId = toast.loading("Saving restaurant details...");
 
-      const response = await fetch("https://api.troveindustries.dev/menu/create-restaurant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // send cookies/session
-        body: JSON.stringify({
-          restaurant_name: formData.name,
-          restaurant_country: formData.country,
-          restaurant_city: formData.city,
-          restaurant_subdomain: formData.subdomain,
-        }),
-      });
+      const response = await fetch(
+          "https://api.troveindustries.dev/restaurant/create-restaurant",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include", // send cookies/session if using Axum cookies
+            body: JSON.stringify({
+              restaurant_name: formData.name,
+              restaurant_country: formData.country,
+              restaurant_city: formData.city,
+              restaurant_subdomain: formData.subdomain,
+            }),
+          }
+      );
 
-      const data = await response.json();
+      // Try parsing JSON safely — handle empty response
+      const data = await response
+          .json()
+          .catch(() => ({ message: "No JSON response" }));
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to save restaurant details");
+        throw new Error(data.error || `Failed: ${response.status}`);
       }
 
-      onSave({
-        name: formData.name,
-        country: formData.country,
-        city: formData.city,
-        subdomain: formData.subdomain,
-      });
-
-      toast.success("Restaurant details saved successfully!");
+      onSave(formData);
+      toast.success("Restaurant details saved successfully!", { id: toastId });
     } catch (err) {
       console.error("Error saving restaurant:", err);
       const errorMessage =
@@ -97,7 +97,9 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                   id="country"
                   placeholder="e.g., Kenya"
                   value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  onChange={(e) =>
+                      setFormData({ ...formData, country: e.target.value })
+                  }
                   required
               />
             </div>
@@ -108,7 +110,9 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                   id="city"
                   placeholder="e.g., Nairobi"
                   value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                  }
                   required
               />
             </div>
@@ -124,7 +128,9 @@ const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormPro
                   onChange={(e) =>
                       setFormData({
                         ...formData,
-                        subdomain: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ""),
+                        subdomain: e.target.value
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]/g, ""),
                       })
                   }
                   required
