@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Category, MealGroup } from "@/pages/MenuBuilder";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface MealGroupFormProps {
@@ -151,11 +151,8 @@ const MealGroupForm = ({ categories, mealGroups, onSave }: MealGroupFormProps) =
 
   if (isCheckingSession) {
     return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Meal Groups</h2>
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
+        <div className="space-y-6 flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
     );
   }
@@ -215,8 +212,17 @@ const MealGroupForm = ({ categories, mealGroups, onSave }: MealGroupFormProps) =
                   </div>
 
                   <Button onClick={addMealGroup} className="w-full" disabled={isLoading}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    {isLoading ? 'Adding...' : 'Add Meal Group'}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Meal Group
+                      </>
+                    )}
                   </Button>
                 </div>
               </Card>

@@ -4,8 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Category } from "@/pages/MenuBuilder";
-import { Plus, Trash2, UtensilsCrossed, Coffee, Soup, IceCream } from "lucide-react";
+import { Plus, Trash2, UtensilsCrossed, Coffee, Soup, IceCream, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import ImageUploadDialog from "./ImageUploadDialog";
 
 interface CategoryFormProps {
   categories: Category[];
@@ -27,11 +28,34 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [restaurantName, setRestaurantName] = useState("");
+  const [recommendedIcon, setRecommendedIcon] = useState<string>("");
+  const [showImageDialog, setShowImageDialog] = useState(false);
+  const [categoryImage, setCategoryImage] = useState<string>("");
 
   // Check session and load existing categories on mount
   useEffect(() => {
     checkSessionAndLoadCategories();
   }, []);
+
+  // AI Icon Recommendation based on category name
+  useEffect(() => {
+    if (newCategory.name.trim()) {
+      const name = newCategory.name.toLowerCase();
+      if (name.includes("main") || name.includes("entree") || name.includes("dinner")) {
+        setRecommendedIcon("utensils");
+      } else if (name.includes("drink") || name.includes("beverage") || name.includes("coffee") || name.includes("tea")) {
+        setRecommendedIcon("coffee");
+      } else if (name.includes("appetizer") || name.includes("soup") || name.includes("starter")) {
+        setRecommendedIcon("soup");
+      } else if (name.includes("dessert") || name.includes("sweet") || name.includes("ice cream")) {
+        setRecommendedIcon("icecream");
+      } else {
+        setRecommendedIcon("");
+      }
+    } else {
+      setRecommendedIcon("");
+    }
+  }, [newCategory.name]);
 
   // Check if user has a valid session and load categories
   const checkSessionAndLoadCategories = async () => {
@@ -198,21 +222,27 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
             </div>
 
             <div>
-              <Label>Category Icon</Label>
+              <Label>Category Icon {recommendedIcon && <span className="text-primary text-xs ml-2">✨ Recommended</span>}</Label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                 {iconOptions.map((option) => {
                   const Icon = option.icon;
+                  const isRecommended = recommendedIcon === option.value;
                   return (
                       <button
                           key={option.value}
                           type="button"
                           onClick={() => setNewCategory({ ...newCategory, icon: option.value })}
-                          className={`p-3 rounded-lg border-2 transition-all ${
+                          className={`p-3 rounded-lg border-2 transition-all relative ${
                               newCategory.icon === option.value
                                   ? "border-primary bg-primary/10"
+                                  : isRecommended
+                                  ? "border-primary/50 bg-primary/5"
                                   : "border-border hover:border-primary/50"
                           }`}
                       >
+                        {isRecommended && (
+                          <span className="absolute -top-1 -right-1 text-primary">✨</span>
+                        )}
                         <Icon className="w-6 h-6 mx-auto mb-1" />
                         <span className="text-xs">{option.label}</span>
                       </button>
@@ -221,12 +251,48 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
               </div>
             </div>
 
+            <div>
+              <Label>Category Image (Optional)</Label>
+              <div className="flex gap-2 mt-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowImageDialog(true)}
+                >
+                  <ImageIcon className="mr-2 h-4 w-4" />
+                  Choose Image
+                </Button>
+                {categoryImage && (
+                  <img src={categoryImage} alt="Category" className="w-16 h-16 object-cover rounded-lg" />
+                )}
+              </div>
+            </div>
+
             <Button onClick={addCategory} className="w-full" disabled={isLoading}>
-              <Plus className="mr-2 h-4 w-4" />
-              {isLoading ? 'Adding...' : 'Add Category'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Category
+                </>
+              )}
             </Button>
           </div>
         </Card>
+
+        <ImageUploadDialog 
+          open={showImageDialog}
+          onClose={() => setShowImageDialog(false)}
+          onSelect={(url) => {
+            setCategoryImage(url);
+            setShowImageDialog(false);
+          }}
+        />
 
         {/* Categories List */}
         {localCategories.length > 0 ? (
