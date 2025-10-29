@@ -28,6 +28,7 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [restaurantName, setRestaurantName] = useState("");
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   // Check session and load existing categories on mount
   useEffect(() => {
@@ -213,10 +214,7 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
                   type="button" 
                   variant="outline" 
                   className="flex-1"
-                  onClick={() => {
-                    const dialog = document.createElement('div');
-                    const tempOpen = true;
-                  }}
+                  onClick={() => setImageDialogOpen(true)}
                 >
                   <ImageIcon className="mr-2 h-4 w-4" />
                   {newCategory.icon ? "Change Image" : "Choose Image"}
@@ -241,9 +239,12 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
         </Card>
 
         <ImageUploadDialog 
-          open={true}
-          onClose={() => {}}
-          onSelect={(url) => setNewCategory({ ...newCategory, icon: url })}
+          open={imageDialogOpen}
+          onClose={() => setImageDialogOpen(false)}
+          onSelect={(url) => {
+            setNewCategory({ ...newCategory, icon: url });
+            setImageDialogOpen(false);
+          }}
         />
 
         {/* Categories List */}

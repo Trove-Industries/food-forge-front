@@ -102,7 +102,17 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Choose Image</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>Choose Image</DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-6 w-6 p-0 rounded-full"
+            >
+              ✕
+            </Button>
+          </div>
         </DialogHeader>
 
         {/* Image Preview Section */}
