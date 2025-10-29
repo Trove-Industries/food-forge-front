@@ -24,38 +24,15 @@ const iconOptions = [
 
 const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
   const [localCategories, setLocalCategories] = useState<Category[]>(categories);
-  const [newCategory, setNewCategory] = useState({ name: "", icon: "utensils" });
+  const [newCategory, setNewCategory] = useState({ name: "", icon: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [restaurantName, setRestaurantName] = useState("");
-  const [recommendedIcon, setRecommendedIcon] = useState<string>("");
-  const [showImageDialog, setShowImageDialog] = useState(false);
-  const [categoryImage, setCategoryImage] = useState<string>("");
 
   // Check session and load existing categories on mount
   useEffect(() => {
     checkSessionAndLoadCategories();
   }, []);
-
-  // AI Icon Recommendation based on category name
-  useEffect(() => {
-    if (newCategory.name.trim()) {
-      const name = newCategory.name.toLowerCase();
-      if (name.includes("main") || name.includes("entree") || name.includes("dinner")) {
-        setRecommendedIcon("utensils");
-      } else if (name.includes("drink") || name.includes("beverage") || name.includes("coffee") || name.includes("tea")) {
-        setRecommendedIcon("coffee");
-      } else if (name.includes("appetizer") || name.includes("soup") || name.includes("starter")) {
-        setRecommendedIcon("soup");
-      } else if (name.includes("dessert") || name.includes("sweet") || name.includes("ice cream")) {
-        setRecommendedIcon("icecream");
-      } else {
-        setRecommendedIcon("");
-      }
-    } else {
-      setRecommendedIcon("");
-    }
-  }, [newCategory.name]);
 
   // Check if user has a valid session and load categories
   const checkSessionAndLoadCategories = async () => {
@@ -128,11 +105,16 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
       return;
     }
 
+    if (!newCategory.icon) {
+      toast.error("Please select a category image");
+      return;
+    }
+
     setIsLoading(true);
 
     const categoryData = {
       category_name: newCategory.name.trim(),
-      category_icon: newCategory.icon
+      category_icon: newCategory.icon // This is now an image URL
     };
 
     try {
@@ -158,7 +140,7 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
         const updated = [...localCategories, category];
         setLocalCategories(updated);
         onSave(updated);
-        setNewCategory({ name: "", icon: "utensils" });
+        setNewCategory({ name: "", icon: "" });
         toast.success("Category added successfully!");
       } else {
         const errorData = await response.json();
@@ -222,50 +204,23 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
             </div>
 
             <div>
-              <Label>Category Icon {recommendedIcon && <span className="text-primary text-xs ml-2">✨ Recommended</span>}</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                {iconOptions.map((option) => {
-                  const Icon = option.icon;
-                  const isRecommended = recommendedIcon === option.value;
-                  return (
-                      <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => setNewCategory({ ...newCategory, icon: option.value })}
-                          className={`p-3 rounded-lg border-2 transition-all relative ${
-                              newCategory.icon === option.value
-                                  ? "border-primary bg-primary/10"
-                                  : isRecommended
-                                  ? "border-primary/50 bg-primary/5"
-                                  : "border-border hover:border-primary/50"
-                          }`}
-                      >
-                        {isRecommended && (
-                          <span className="absolute -top-1 -right-1 text-primary">✨</span>
-                        )}
-                        <Icon className="w-6 h-6 mx-auto mb-1" />
-                        <span className="text-xs">{option.label}</span>
-                      </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <Label>Category Image (Optional)</Label>
-              <div className="flex gap-2 mt-2">
+              <Label>Category Image *</Label>
+              <div className="flex gap-2 items-center mt-2">
+                {newCategory.icon && (
+                  <img src={newCategory.icon} alt="Category" className="w-20 h-20 object-cover rounded-lg border-2 border-primary" />
+                )}
                 <Button 
                   type="button" 
                   variant="outline" 
                   className="flex-1"
-                  onClick={() => setShowImageDialog(true)}
+                  onClick={() => {
+                    const dialog = document.createElement('div');
+                    const tempOpen = true;
+                  }}
                 >
                   <ImageIcon className="mr-2 h-4 w-4" />
-                  Choose Image
+                  {newCategory.icon ? "Change Image" : "Choose Image"}
                 </Button>
-                {categoryImage && (
-                  <img src={categoryImage} alt="Category" className="w-16 h-16 object-cover rounded-lg" />
-                )}
               </div>
             </div>
 
@@ -286,12 +241,9 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
         </Card>
 
         <ImageUploadDialog 
-          open={showImageDialog}
-          onClose={() => setShowImageDialog(false)}
-          onSelect={(url) => {
-            setCategoryImage(url);
-            setShowImageDialog(false);
-          }}
+          open={true}
+          onClose={() => {}}
+          onSelect={(url) => setNewCategory({ ...newCategory, icon: url })}
         />
 
         {/* Categories List */}
@@ -300,13 +252,20 @@ const CategoryForm = ({ categories, onSave }: CategoryFormProps) => {
               <h3 className="font-semibold">Your Categories ({localCategories.length})</h3>
               <div className="grid gap-3">
                 {localCategories.map((category) => {
-                  const IconComponent = iconOptions.find((i) => i.value === category.icon)?.icon || UtensilsCrossed;
                   return (
                       <Card key={category.id} className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-primary/10 rounded-lg">
-                            <IconComponent className="w-5 h-5 text-primary" />
-                          </div>
+                          {category.icon ? (
+                            <img 
+                              src={category.icon} 
+                              alt={category.name}
+                              className="w-12 h-12 object-cover rounded-lg"
+                            />
+                          ) : (
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              <UtensilsCrossed className="w-5 h-5 text-primary" />
+                            </div>
+                          )}
                           <div>
                             <span className="font-medium">{category.name}</span>
                             <p className="text-xs text-muted-foreground">ID: {category.id}</p>
