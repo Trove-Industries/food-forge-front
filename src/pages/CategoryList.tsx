@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Edit2, Loader2, UtensilsCrossed, Coffee, Soup, IceCream } from "lucide-react";
+import { ArrowLeft, Edit2, Loader2, UtensilsCrossed, Coffee, Soup, IceCream, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -89,10 +89,16 @@ const CategoryList = () => {
       {/* Header */}
       <div className="border-b bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 py-6">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </Button>
+            <Button onClick={() => navigate("/builder?step=2")}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Category
+            </Button>
+          </div>
           <h1 className="text-3xl font-bold">All Categories</h1>
           <p className="text-muted-foreground">Manage your menu categories</p>
         </div>
@@ -145,15 +151,23 @@ const CategoryList = () => {
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={() => handleSave(category.id)}>Save</Button>
-                        <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+                        <Button variant="outline" onClick={handleCancel}>Back to List</Button>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="p-3 bg-primary/10 rounded-lg">
-                          <IconComponent className="w-6 h-6 text-primary" />
-                        </div>
+                        {category.category_icon && category.category_icon.startsWith('http') ? (
+                          <img 
+                            src={category.category_icon} 
+                            alt={category.category_name}
+                            className="w-12 h-12 object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="p-3 bg-primary/10 rounded-lg">
+                            <IconComponent className="w-6 h-6 text-primary" />
+                          </div>
+                        )}
                         <div>
                           <h3 className="text-lg font-semibold">{category.category_name}</h3>
                           <p className="text-sm text-muted-foreground">ID: {category.id}</p>

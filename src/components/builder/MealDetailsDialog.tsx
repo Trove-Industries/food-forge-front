@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MealGroup, Meal, MealSize, MealPairing, MealIngredient } from "@/pages/MenuBuilder";
-import { Plus, Trash2, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, Wand2 } from "lucide-react";
 import ImageUploadDialog from "./ImageUploadDialog";
 import { toast } from "sonner";
 
@@ -206,15 +206,33 @@ const MealDetailsDialog = ({ mealGroups, meal, onSave, onCancel, isLoading = fal
 
             <div>
               <Label htmlFor="description">Description *</Label>
-              <Textarea
-                  id="description"
-                  placeholder="e.g., Sweet pasta rotini with special sauce"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  required
+              <div className="space-y-2">
+                <Textarea
+                    id="description"
+                    placeholder="e.g., Sweet pasta rotini with special sauce"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
+                    required
+                    disabled={isLoading}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    // TODO: Add API endpoint for AI description generation
+                    // POST /api/generate-description
+                    // Body: { mealName: formData.name, context: "meal" }
+                    toast.info("AI description generation - Add API endpoint: POST /api/generate-description");
+                  }}
                   disabled={isLoading}
-              />
+                >
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Generate Description with AI
+                </Button>
+              </div>
             </div>
 
             <div>

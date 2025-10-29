@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Edit2, Loader2, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Edit2, Loader2, UtensilsCrossed, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,10 +82,16 @@ const MealGroupList = () => {
       {/* Header */}
       <div className="border-b bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 py-6">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </Button>
+            <Button onClick={() => navigate("/builder?step=3")}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Meal Group
+            </Button>
+          </div>
           <h1 className="text-3xl font-bold">All Meal Groups</h1>
           <p className="text-muted-foreground">Manage your meal groups</p>
         </div>
@@ -115,7 +121,7 @@ const MealGroupList = () => {
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={() => handleSave(mealGroup.id)}>Save</Button>
-                        <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+                        <Button variant="outline" onClick={handleCancel}>Back to List</Button>
                       </div>
                     </div>
                   ) : (
