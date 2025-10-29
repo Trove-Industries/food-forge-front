@@ -33,11 +33,15 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
     { url: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop", tags: "coffee, drink, beverage" },
     { url: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop", tags: "dessert, cake, sweet" },
     { url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop", tags: "salad, vegetables, healthy" },
-    { url: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTU8W89aGsK2QYB_hVblPGlFpLVbRtb79TtrWQ9DqVUPaKJIEB2hf5o7OiSz1GpvpzEEsJgyn6wf63ISgsLCq26Y88kt-HwKXo49UtU7UiXYA", tags: "tomato, vegetables" },
+    { url: "https://i.pinimg.com/736x/cb/71/90/cb7190237e3098a376a1807a1dcdb48d.jpg", tags: "tomato, vegetables" },
     { url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRf9bA9i-nyZgHZWir7DeVD6IR5BJkA0o0_JrBRKhME1DLx6sb3_RGldy_rZiEqoSRtbUdfMfEI--zhCs8j4ZiI_BSbb9KjpsiNk9vLKXd4Q", tags: "meatballs, meat" },
-    { url: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQzTUUMXAyflpWoKdc-L6MomOgYIT9MNYY-C00vVU2a2jqTBoCPbQjyd5h8kCI562y11ANbLwmJOd0K2KNkiZ4piUR_P4AfnpY4r-mstEFw", tags: "kachumbari, vegetables" },
+    { url: "https://i.pinimg.com/1200x/33/92/2f/33922fd459606d395b28baa3956cfdb5.jpg", tags: "kachumbari, salad, vegetables" },
     { url: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSf4t3OprDUwiqDni0DQoOnn29j3B2KJ7oHHgfs6ckcxj2sYqENKwoe3oJrxNeQe9Tw0uNQhZsYtBJlaClB42r0Xq2zjIMjh4gwz0hYShjmMg", tags: "espresso, coffee" },
     { url: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRtI_oV1Fi9wfDWE24cwaOstd9bIw9xD4vcDZcoD77hamL-H1rmZfy3pjJ5LY9TB9zJsThLxaXWt13_4Lj1m-Zdgh1EktcoXXURuzgJ0ImA", tags: "snack, mandazi" },
+    { url: "https://cdn1.iconfinder.com/data/icons/restaurant-65/50/Restaurant_Outline-29-512.png", tags: "icon, main course" },
+    { url: "https://i.pinimg.com/1200x/d4/af/ae/d4afaea8a8793de367d324501f016638.jpg", tags: "pasta, main course" },
+    { url: "https://i.pinimg.com/1200x/40/cd/38/40cd38541bce3ccba80ea8f87409d539.jpg", tags: "beef, main course" },
+    { url: "https://i.pinimg.com/1200x/41/8a/4d/418a4dba2668bf8446094fdaf94fe85e.jpg", tags: "chili, main course" },
   ];
 
   // Filter stock images based on search query
