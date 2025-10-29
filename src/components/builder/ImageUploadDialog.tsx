@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Wand2, Image as ImageIcon, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 interface ImageUploadDialogProps {
@@ -17,7 +16,6 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
   const [uploadedImage, setUploadedImage] = useState<string>("");
   const [generatedImage, setGeneratedImage] = useState<string>("");
   const [selectedStock, setSelectedStock] = useState<string>("");
-  const [selectedImage, setSelectedImage] = useState<string>("");
   const [aiPrompt, setAiPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [stockSearchQuery, setStockSearchQuery] = useState<string>("");
@@ -54,7 +52,6 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
       reader.onloadend = () => {
         const result = reader.result as string;
         setUploadedImage(result);
-        setSelectedImage(result);
         
         // API Integration Point: POST /api/upload-image
         // Upload the file to your server/storage
@@ -76,9 +73,7 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
     
     // Simulated delay
     setTimeout(() => {
-      const img = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop";
-      setGeneratedImage(img);
-      setSelectedImage(img);
+      setGeneratedImage("https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop");
       setIsGenerating(false);
       toast.success("Image generated!");
     }, 2000);
@@ -105,31 +100,6 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
           <DialogTitle>Choose Image</DialogTitle>
         </DialogHeader>
 
-        {/* Image Preview Section */}
-        {selectedImage && (
-          <div className="p-4 bg-accent/30 rounded-lg border-2 border-primary/20">
-            <Label className="text-sm font-semibold mb-2 block">Selected Image Preview</Label>
-            <div className="flex items-center gap-4">
-              <img 
-                src={selectedImage} 
-                alt="Selected preview" 
-                className="w-32 h-32 object-cover rounded-lg border-2 border-primary"
-              />
-              <div className="flex-1">
-                <p className="text-sm text-muted-foreground mb-3">This image will be used for your category</p>
-                <Button 
-                  onClick={() => handleSelect(selectedImage)} 
-                  className="w-full"
-                  size="sm"
-                >
-                  <ImageIcon className="mr-2 h-4 w-4" />
-                  Use This Image
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
         <Tabs defaultValue="upload" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="upload">Upload</TabsTrigger>
@@ -153,8 +123,11 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
             </div>
             
             {uploadedImage && (
-              <div className="mt-4">
+              <div className="space-y-3">
                 <img src={uploadedImage} alt="Uploaded" className="w-full h-48 object-cover rounded-lg" />
+                <Button onClick={() => handleSelect(uploadedImage)} className="w-full">
+                  Use This Image
+                </Button>
               </div>
             )}
           </TabsContent>
@@ -194,10 +167,7 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
                         className={`cursor-pointer border-2 rounded-lg overflow-hidden transition-all ${
                           selectedStock === img.url ? "border-primary ring-2 ring-primary" : "border-transparent"
                         }`}
-                        onClick={() => {
-                          setSelectedStock(img.url);
-                          setSelectedImage(img.url);
-                        }}
+                        onClick={() => setSelectedStock(img.url)}
                       >
                         <img src={img.url} alt={img.tags} className="w-full h-40 object-cover" />
                       </div>
@@ -205,6 +175,12 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
                   </div>
                 )}
               </>
+            )}
+            
+            {selectedStock && (
+              <Button onClick={() => handleSelect(selectedStock)} className="w-full">
+                Use Selected Image
+              </Button>
             )}
           </TabsContent>
 
@@ -226,8 +202,11 @@ const ImageUploadDialog = ({ open, onClose, onSelect }: ImageUploadDialogProps) 
             </div>
 
             {generatedImage && (
-              <div className="mt-4">
+              <div className="space-y-3">
                 <img src={generatedImage} alt="Generated" className="w-full h-48 object-cover rounded-lg" />
+                <Button onClick={() => handleSelect(generatedImage)} className="w-full">
+                  Use This Image
+                </Button>
               </div>
             )}
           </TabsContent>
