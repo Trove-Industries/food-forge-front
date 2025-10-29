@@ -7,7 +7,8 @@ import { ChefHat } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
-const API_BASE_URL = "http://localhost:8000";
+//const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://api.troveindustries.dev";
 
 const Signup = () => {
   const navigate = useNavigate();

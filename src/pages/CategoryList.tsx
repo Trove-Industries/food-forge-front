@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const API_BASE_URL = "http://localhost:8000";
+//const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://api.troveindustries.dev";
 
 interface Category {
   id: number;

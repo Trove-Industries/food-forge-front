@@ -14,7 +14,8 @@ interface MealGroupFormProps {
   onSave: (data: MealGroup[]) => void;
 }
 
-const API_BASE_URL = 'http://localhost:8000';
+//const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://api.troveindustries.dev";
 
 const MealGroupForm = ({ categories, mealGroups, onSave }: MealGroupFormProps) => {
   const [localMealGroups, setLocalMealGroups] = useState<MealGroup[]>(mealGroups);

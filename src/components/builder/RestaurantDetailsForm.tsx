@@ -11,7 +11,8 @@ interface RestaurantDetailsFormProps {
   onSave: (data: RestaurantDetails) => void;
 }
 
-const API_BASE_URL = 'http://localhost:8000';
+//const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://api.troveindustries.dev";
 
 const RestaurantDetailsForm = ({ initialData, onSave }: RestaurantDetailsFormProps) => {
   const [formData, setFormData] = useState<RestaurantDetails>(

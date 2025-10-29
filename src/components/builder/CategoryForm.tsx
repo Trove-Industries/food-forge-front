@@ -13,7 +13,8 @@ interface CategoryFormProps {
   onSave: (data: Category[]) => void;
 }
 
-const API_BASE_URL = 'http://localhost:8000';
+//const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://api.troveindustries.dev";
 
 const iconOptions = [
   { value: "utensils", icon: UtensilsCrossed, label: "Main Course" },

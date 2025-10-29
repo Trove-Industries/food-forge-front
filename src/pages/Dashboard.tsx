@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { ChefHat, Menu, Eye, BarChart, Settings, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
-const API_BASE_URL = "http://localhost:8000";
+//const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://api.troveindustries.dev";
 
 interface RestaurantDetails {
   restaurant_name: string;
